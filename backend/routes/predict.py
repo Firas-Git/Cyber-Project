@@ -86,6 +86,8 @@ async def predict_attack(
         "explanation": _build_explanation(attack_info, result["feature_contributions"]),
         "recommended_action": _recommended_action(prediction, risk["level"]),
         "feature_contributions": result["feature_contributions"],
+        "model_used": result.get("model_used", "random_forest"),
+        "model_display": result.get("model_display", "Random Forest"),
     }
 
     # ── Persist prediction to MongoDB ──────────────────────────────────────────

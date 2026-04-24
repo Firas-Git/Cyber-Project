@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from config import get_settings
 from database.mongodb import connect_db, close_db
 from services.model_service import load_model
-from routes import upload, analysis, predict, metrics, auth, history
+from routes import upload, analysis, predict, metrics, auth, history, models
 from routes.websocket import router as ws_router
 
 
@@ -47,6 +47,7 @@ app.include_router(analysis.router, prefix="/api/analysis", tags=["Analysis"])
 app.include_router(predict.router,  prefix="/api/predict",  tags=["Predict"])
 app.include_router(metrics.router,  prefix="/api/metrics",  tags=["Metrics"])
 app.include_router(history.router,  prefix="/api/history",  tags=["History"])
+app.include_router(models.router,   prefix="/api/models",   tags=["Models"])
 app.include_router(ws_router,       tags=["WebSocket"])
 
 
