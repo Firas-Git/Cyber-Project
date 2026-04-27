@@ -21,10 +21,25 @@ async def upload_csv(
         raise HTTPException(status_code=400, detail="Only CSV files are accepted.")
 
     contents = await file.read()
-    try:
-        df = pd.read_csv(io.StringIO(contents.decode("utf-8")))
-    except Exception as e:
-        raise HTTPException(status_code=422, detail=f"Failed to parse CSV: {str(e)}")
+
+    # Try common encodings before giving up
+    df = None
+    for enc in ("utf-8", "utf-8-sig", "latin-1", "cp1252", "iso-8859-1"):
+        try:
+            df = pd.read_csv(io.StringIO(contents.decode(enc)))
+            break
+        except (UnicodeDecodeError, pd.errors.ParserError):
+            continue
+        except Exception:
+            break
+
+    if df is None:
+        raise HTTPException(
+            status_code=422,
+            detail="PARSE_ERROR: The file could not be read as a valid CSV. "
+                   "Make sure it is a plain-text comma-separated file saved with "
+                   "UTF-8, Latin-1, or Windows-1252 encoding.",
+        )
 
     df = preprocess_dataframe(df)
     state.set_dataset(df)
